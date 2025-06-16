@@ -71,7 +71,7 @@ def setup_periodic_tasks(sender, **kwargs):
 import os
 import redis
 
-redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+redis_url = os.getenv("REDIS_URL")
 try:
     client = redis.StrictRedis.from_url(redis_url)
     print(client.ping())

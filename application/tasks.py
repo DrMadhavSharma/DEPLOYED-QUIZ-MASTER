@@ -1,5 +1,4 @@
-import os
-import ssl
+
 import csv
 import datetime
 import requests
@@ -8,18 +7,7 @@ from .models import Quiz, User, Notification, db
 from .utils import format_report
 from .mail import send_email
 
-# === Redis URL from Railway / Upstash ===
-REDIS_URL = os.getenv("REDIS_URL")
 
-if not REDIS_URL or not REDIS_URL.startswith(("redis://", "rediss://")):
-    raise ValueError("Invalid REDIS_URL")
-
-# === Celery Setup ===
-celery = Celery("tasks", broker=REDIS_URL, backend=REDIS_URL)
-
-if REDIS_URL.startswith("rediss://"):
-    celery.conf.broker_use_ssl = {"ssl_cert_reqs": ssl.CERT_NONE}
-    celery.conf.result_backend_use_ssl = {"ssl_cert_reqs": ssl.CERT_NONE}
 @shared_task(ignore_results = False, name = "download_csv_report")
 def csv_report():
     quizzes = Quiz.query.all() # admin

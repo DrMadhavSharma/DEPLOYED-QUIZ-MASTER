@@ -15,6 +15,15 @@ if not REDIS_URL or not REDIS_URL.startswith(("redis://", "rediss://")):
     raise ValueError("Invalid REDIS_URL")
 
 celery = Celery("tasks", broker=REDIS_URL, backend=REDIS_URL)
+
+# Force SSL settings for rediss://
+if REDIS_URL.startswith("rediss://"):
+    celery.conf.broker_use_ssl = {
+        "ssl_cert_reqs": "none"
+    }
+    celery.conf.result_backend_transport_options = {
+        "ssl_cert_reqs": "none"
+    }
 @shared_task(ignore_results = False, name = "download_csv_report")
 def csv_report():
     quizzes = Quiz.query.all() # admin

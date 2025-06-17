@@ -1,7 +1,6 @@
 from flask import Flask 
 from application.database import db 
 from application.models import User, Role 
-from application.tasks import celery
 from application.resources import api
 from application.config import LocalDevelopmentConfig
 from flask_security import Security, SQLAlchemyUserDatastore

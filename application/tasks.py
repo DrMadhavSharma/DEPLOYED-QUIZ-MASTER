@@ -1,30 +1,25 @@
-from celery import shared_task #it helps us to use the celery object defined in the other file
-from .models import *
-from .utils import format_report
-from .mail import send_email
-import datetime
-import csv
-import requests #plural
-import json
 import os
 import ssl
-from celery import Celery
+import csv
+import datetime
+import requests
+from celery import Celery, shared_task
+from .models import Quiz, User, Notification, db
+from .utils import format_report
+from .mail import send_email
 
+# === Redis URL from Railway / Upstash ===
 REDIS_URL = os.getenv("REDIS_URL")
 
 if not REDIS_URL or not REDIS_URL.startswith(("redis://", "rediss://")):
     raise ValueError("Invalid REDIS_URL")
 
+# === Celery Setup ===
 celery = Celery("tasks", broker=REDIS_URL, backend=REDIS_URL)
 
 if REDIS_URL.startswith("rediss://"):
-    celery.conf.broker_use_ssl = {
-        "ssl_cert_reqs": ssl.CERT_NONE
-    }
-    celery.conf.redis_backend_use_ssl = {
-        "ssl_cert_reqs": ssl.CERT_NONE
-    }
-
+    celery.conf.broker_use_ssl = {"ssl_cert_reqs": ssl.CERT_NONE}
+    celery.conf.result_backend_use_ssl = {"ssl_cert_reqs": ssl.CERT_NONE}
 @shared_task(ignore_results = False, name = "download_csv_report")
 def csv_report():
     quizzes = Quiz.query.all() # admin

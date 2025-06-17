@@ -11,8 +11,7 @@ from celery import Celery
 
 REDIS_URL = os.getenv("REDIS_URL")
 
-if not REDIS_URL or not REDIS_URL.startswith("redis://"):
-    raise ValueError("Invalid REDIS_URL")
+if not REDIS_URL or not REDIS_URL.startswith(("redis://", "rediss://")):
 
 celery = Celery("tasks", broker=REDIS_URL, backend=REDIS_URL)
 @shared_task(ignore_results = False, name = "download_csv_report")
